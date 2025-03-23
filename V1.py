@@ -40,7 +40,13 @@ def initialise_debut(grille):
             mettre_char_coord(grille, i , y, "○")
 
 def initialise_milieu(grille):
-    pass
+    liste = [2, 3, 1, 3, 2, 1, 1, 2, 3, 3, 1, 1, 2, 3, 2, 1, 3, 2, 1, 1, 3, 1, 2, 3, 1, 2, 3, 1, 2, 3, 3, 1, 1, 3, 2, 1, 3, 1, 2, 3, 1, 2, 3, 2, 1, 3, 2, 1, 1, 3, 2, 3, 2, 1, 1, 3, 2, 1, 3, 2, 3, 1, 2, 1, 3, 2, 1, 1, 3, 2, 3, 3, 1, 2, 1, 3, 1, 2, 1, 3, 2]
+    for i in range(TAILLE_GRILLE):
+        for j in range (TAILLE_GRILLE):
+            if liste[i*TAILLE_GRILLE+j] == 1:
+                mettre_char_coord(grille, i, j, "●")
+            if liste[i*TAILLE_GRILLE+j] == 2:
+                mettre_char_coord(grille, i, j, "○")
 
 def initialise_fin(grille):
     pass
@@ -193,7 +199,5 @@ def lancement():
         elif choix == 5:
             break
         choix = menu_choix("Atelier12")
-
-
 
 lancement()
