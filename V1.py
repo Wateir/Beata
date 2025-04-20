@@ -26,30 +26,54 @@ def convertir_en_tuple(coord):
     lettre_num = ord(lettre) - ord('A')
     return (lettre_num, chiffre - 1)
 
+def obtenir_pion(coord,grille):
+    return grille[(coord[0]-1) * TAILLE_GRILLE + coord[1]]
+
+
+# Retirer permet a l'user de la fonction si l'ancienne postions doit etre retirer
+def bouger_pion(coord_avant,coord_apres,grille,retirer):
+    contenu = obtenir_pion(coord_avant,grille)
+    mettre_char_coord(grille, coord_apres[0],coord_apres[1], contenu)
+    if retirer == "oui":
+        mettre_char_coord(grille, coord_avant[0],coord_avant[1], " ")
+    return 0
 
 def mettre_char_coord(grille,x,y,char):
     grille[x][y]=char
 
-def initialise_debut(grille):
-    i = 0
-    for i in range(int(TAILLE_GRILLE/3)):
-        for y in range(TAILLE_GRILLE):
-            mettre_char_coord(grille, i, y, "●")
-    for i in range(int(TAILLE_GRILLE/3+3),TAILLE_GRILLE):
-        for y in range(TAILLE_GRILLE):
-            mettre_char_coord(grille, i , y, "○")
+def initialise(grille, periode):
+    def remplir_depuis_liste(grille, liste, symbole_1, symbole_2):
+        for i in range(TAILLE_GRILLE):
+            for j in range(TAILLE_GRILLE):
+                val = liste[(i-1) * TAILLE_GRILLE + j]
+                if val == 3:
+                    mettre_char_coord(grille, i, j, symbole_1)
+                elif val == 2 or val == 3:
+                    mettre_char_coord(grille, i, j, symbole_2)
 
-def initialise_milieu(grille):
-    liste = [2, 3, 1, 3, 2, 1, 1, 2, 3, 3, 1, 1, 2, 3, 2, 1, 3, 2, 1, 1, 3, 1, 2, 3, 1, 2, 3, 1, 2, 3, 3, 1, 1, 3, 2, 1, 3, 1, 2, 3, 1, 2, 3, 2, 1, 3, 2, 1, 1, 3, 2, 3, 2, 1, 1, 3, 2, 1, 3, 2, 3, 1, 2, 1, 3, 2, 1, 1, 3, 2, 3, 3, 1, 2, 1, 3, 1, 2, 1, 3, 2]
-    for i in range(TAILLE_GRILLE):
-        for j in range (TAILLE_GRILLE):
-            if liste[i*TAILLE_GRILLE+j] == 1:
-                mettre_char_coord(grille, i, j, "●")
-            if liste[i*TAILLE_GRILLE+j] == 2:
-                mettre_char_coord(grille, i, j, "○")
+    def initialise_debut(grille):
+        limite = int(TAILLE_GRILLE / 3)
+        for i in range(TAILLE_GRILLE):
+            symbole = "●" if i < limite else ("○" if i >= limite + 3 else " ")
+            if symbole != " ":
+                for j in range(TAILLE_GRILLE):
+                    mettre_char_coord(grille, i, j, symbole)
 
-def initialise_fin(grille):
-    pass
+    def initialise_milieu(grille):
+        liste = [2, 3, 3, 3, 2, 1, 1, 2, 3, 3, 3, 1, 2, 3, 2, 1, 3, 2, 3, 1, 3, 1, 2, 3, 3, 2, 3, 1, 2, 3, 3, 1, 1, 3, 2, 1, 3, 1, 2, 3, 1, 2, 3, 2, 1, 3, 2, 1, 1, 3, 2, 3, 2, 1, 1, 3, 2, 1, 3, 2, 3, 1, 2, 1, 3, 2, 1, 1, 3, 2, 3, 3, 1, 2, 1, 3, 1, 2, 1, 3, 2]
+        remplir_depuis_liste(grille, liste, "●", "○")
+
+    def initialise_fin(grille):
+        liste = [1, 3, 1, 1, 1, 2, 1, 2, 1, 3, 1, 1, 2, 1, 1, 1, 1, 2, 2, 1, 1, 1, 1, 1, 2, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+        remplir_depuis_liste(grille, liste, "●", "○")
+
+    if periode == "debut":
+        initialise_debut(grille)
+    elif periode == "milieu":
+        initialise_milieu(grille)
+    else:
+        initialise_fin(grille)
+
 
 def afficher_grille(matrice):
     print("    A   B   C   D   E   F   G   H   I  ")
@@ -62,8 +86,6 @@ def afficher_grille(matrice):
             ligne_final += f" {valeur} |"
         print(coordonnée_vertical, ligne_final)
         print("  -------------------------------------")
-
-
 
 
 def est_au_bon_format(coord):
@@ -84,8 +106,6 @@ def est_dans_grille(coord):
             return False
     else:
         return False
-
-
 
 
 def menu_choix(type):
@@ -166,23 +186,26 @@ def lancement():
         choix = menu_choix("ouverture")
         if choix == 0:
             error("Choix hors de porté",0)
-        if choix == 1:
+        if choix == 3:
             print("Run test")
             test()
+            print("")
+            print("Test passé avec succés")
     choix = 0
 
     choix = menu_choix("Atelier1")
     while True:
         if choix in [1,2,3,4]:
+            plateau_jeu = donner_grille()
             if choix == 1:
-                initialise_debut(plateau_jeu)
+                initialise(plateau_jeu,"debut")
                 afficher_grille(plateau_jeu)
 
             elif choix == 2:
-                initialise_milieu(plateau_jeu)
+                initialise(plateau_jeu,"milieu")
                 afficher_grille(plateau_jeu)
             elif choix == 3:
-                initialise_fin(plateau_jeu)
+                initialise(plateau_jeu,"fin")
                 afficher_grille(plateau_jeu)
             elif choix == 4:
                 coord = input("Rentrer une coordonnée (exp : A3) : ")
