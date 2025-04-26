@@ -27,7 +27,9 @@ def convertir_en_tuple(coord):
     return (lettre_num, chiffre - 1)
 
 def obtenir_pion(coord,grille):
-    return grille[(coord[0]-1) * TAILLE_GRILLE + coord[1]]
+    x, y = coord
+    return grille[x][y]
+
 
 
 # Retirer permet a l'user de la fonction si l'ancienne postions doit etre retirer
@@ -47,10 +49,10 @@ def faire_mouvement(coord_avant, coord_apres, grille):
         direction = [0, 0]
         vecteur = (coord_avant[0] - coord_apres[0], coord_avant[1] - coord_apres[1])
         if (not vecteur[0] and not vecteur[1]):
-            return 1
+           return 1
         if (not vecteur[0]):
-            direction[0] = 0
-            direction[1] = vecteur[1] // abs(vecteur[1])
+           direction[0] = 0
+           direction[1] = vecteur[1] // abs(vecteur[1])
         elif (not vecteur[1]):
             direction[0] = vecteur[0] // abs(vecteur[0])
             direction[1] = 0
@@ -61,14 +63,15 @@ def faire_mouvement(coord_avant, coord_apres, grille):
             direction[1] = vecteur[1] // abs(vecteur[1])
 
         pos = [coord_avant[0] + direction[0], coord_avant[1] + direction[1]]
-        while [pos[0] < coord_apres[0] and pos[1] < coord_apres[1]]:
+        while pos[0] != coord_apres[0] and pos[1] != coord_apres[1]:
             if (grille[pos[0]][pos[1]] != " "):
+                print(coord_avant)
+                print(pos)
                 return 1
             pos[0] += direction[0]
             pos[1] += direction[1]
 
-
-        mettre_char_coord(grille,coord_apres,obtenir_pion(coord_avant,grille),)
+        mettre_char_coord(grille,coord_apres,obtenir_pion(coord_avant,grille))
         mettre_char_coord(grille,coord_avant," ")
         return 0
     result = elimination(coord_avant, coord_apres, grille)
@@ -205,9 +208,10 @@ def test_faire_mouvement():
     plateau_test = donner_grille()
 
     mettre_char_coord(plateau_test,(1,1),"●")
-    afficher_grille(plateau_test)
-    faire_mouvement((1,1),(1,3), plateau_test)
-    afficher_grille(plateau_test)
+    assert faire_mouvement((1,1),(1,3), plateau_test) == 0, "Bouger 2 case a droite"
+    assert faire_mouvement((1,1),(1,4), plateau_test) == 0, "Bouger 3 case a droite"
+    assert faire_mouvement((1,1),(2,4), plateau_test) == 1, "Deplacement invalide"
+
 
 def test():
     test_est_au_bon_format()
