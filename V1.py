@@ -33,13 +33,50 @@ def obtenir_pion(coord,grille):
 # Retirer permet a l'user de la fonction si l'ancienne postions doit etre retirer
 def bouger_pion(coord_avant,coord_apres,grille,retirer):
     contenu = obtenir_pion(coord_avant,grille)
-    mettre_char_coord(grille, coord_apres[0],coord_apres[1], contenu)
+    mettre_char_coord(grille, coord_apres, contenu)
     if retirer == "oui":
-        mettre_char_coord(grille, coord_avant[0],coord_avant[1], " ")
+        mettre_char_coord(grille, coord_avant, " ")
     return 0
 
-def mettre_char_coord(grille,x,y,char):
-    grille[x][y]=char
+def faire_mouvement(coord_avant, coord_apres, grille):
+    def elimination(coord_avant, coord_apres, grille):
+        """ La case d’arrivé doit être occupé par un pion adverse.
+        - Que les cases entre votre pion(départ) et le pion ennemi(arrivé) soit vide.
+        - Que entre votre pion et le pion de votre adversaires il y est au moins une case vide qui les
+        séparent."""
+        direction = [0, 0]
+        vecteur = (coord_avant[0] - coord_apres[0], coord_avant[1] - coord_apres[1])
+        if (not vecteur[0] and not vecteur[1]):
+            return 1
+        if (not vecteur[0]):
+            direction[0] = 0
+            direction[1] = vecteur[1] // abs(vecteur[1])
+        elif (not vecteur[1]):
+            direction[0] = vecteur[0] // abs(vecteur[0])
+            direction[1] = 0
+        elif (abs(direction[0]) != abs(direction[1]) or abs(direction[0]) < 2 or abs(direction[1]) < 2):
+            return 1
+        else:
+            direction[0] = vecteur[0] // abs(vecteur[0])
+            direction[1] = vecteur[1] // abs(vecteur[1])
+
+        pos = [coord_avant[0] + direction[0], coord_avant[1] + direction[1]]
+        while [pos[0] < coord_apres[0] and pos[1] < coord_apres[1]]:
+            if (grille[pos[0]][pos[1]] != " "):
+                return 1
+            pos[0] += direction[0]
+            pos[1] += direction[1]
+
+
+        mettre_char_coord(grille,coord_apres,obtenir_pion(coord_avant,grille),)
+        mettre_char_coord(grille,coord_avant," ")
+        return 0
+    result = elimination(coord_avant, coord_apres, grille)
+
+    return result
+
+def mettre_char_coord(grille,coord,char):
+    grille[coord[0]][coord[1]]=char
 
 def initialise(grille, periode):
     def remplir_depuis_liste(grille, liste, symbole_1, symbole_2):
@@ -47,9 +84,9 @@ def initialise(grille, periode):
             for j in range(TAILLE_GRILLE):
                 val = liste[(i-1) * TAILLE_GRILLE + j]
                 if val == 3:
-                    mettre_char_coord(grille, i, j, symbole_1)
+                    mettre_char_coord(grille, (i,j), symbole_1)
                 elif val == 2 or val == 3:
-                    mettre_char_coord(grille, i, j, symbole_2)
+                    mettre_char_coord(grille,  (i,j), symbole_2)
 
     def initialise_debut(grille):
         limite = int(TAILLE_GRILLE / 3)
@@ -57,7 +94,7 @@ def initialise(grille, periode):
             symbole = "●" if i < limite else ("○" if i >= limite + 3 else " ")
             if symbole != " ":
                 for j in range(TAILLE_GRILLE):
-                    mettre_char_coord(grille, i, j, symbole)
+                    mettre_char_coord(grille, (i,j), symbole)
 
     def initialise_milieu(grille):
         liste = [2, 3, 3, 3, 2, 1, 1, 2, 3, 3, 3, 1, 2, 3, 2, 1, 3, 2, 3, 1, 3, 1, 2, 3, 3, 2, 3, 1, 2, 3, 3, 1, 1, 3, 2, 1, 3, 1, 2, 3, 1, 2, 3, 2, 1, 3, 2, 1, 1, 3, 2, 3, 2, 1, 1, 3, 2, 1, 3, 2, 3, 1, 2, 1, 3, 2, 1, 1, 3, 2, 3, 3, 1, 2, 1, 3, 1, 2, 1, 3, 2]
@@ -164,6 +201,14 @@ def test_est_dans_grille():
     assert est_dans_grille("J9") == 0  , "First case not on the grille"
 
 
+def test_faire_mouvement():
+    plateau_test = donner_grille()
+
+    mettre_char_coord(plateau_test,(1,1),"●")
+    afficher_grille(plateau_test)
+    faire_mouvement((1,1),(1,3), plateau_test)
+    afficher_grille(plateau_test)
+
 def test():
     test_est_au_bon_format()
     test_est_dans_grille()
@@ -214,7 +259,7 @@ def lancement():
                         print("Coordonnée invalide")
                     else:
                         x, y = convertir_en_tuple(coord)
-                        mettre_char_coord(plateau_jeu, x, y, "X")
+                        mettre_char_coord(plateau_jeu, (x,y), "X")
                         print("Yo")
                         afficher_grille(plateau_jeu)
                 else:
@@ -223,4 +268,6 @@ def lancement():
             break
         choix = menu_choix("Atelier12")
 
-lancement()
+#lancement()
+
+test_faire_mouvement()
