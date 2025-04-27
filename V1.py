@@ -13,11 +13,6 @@ def donner_pion(couleur):
     else:
         return PION_NOIR
 
-def obtenir_numero_pion(pion):
-    if pion == PION_BLANC:
-        return 1
-    else:
-        return 0
 
 def donner_grille():
     grille = [
@@ -204,7 +199,7 @@ def est_dans_grille(coord):
     else:
         return False
 
-def demander_coord(grille,char):
+def demander_coord():
     while True:
         coord = input("Rentrer une coordonnée (exp : A3) : ")
         if est_au_bon_format(coord):
@@ -212,14 +207,40 @@ def demander_coord(grille,char):
                 print("Coordonnée invalide")
             else:
                 x, y = convertir_en_tuple(coord)
-                mettre_char_coord(grille, (y,x), char)
-                break
+                return y , x
         else:
             print("Coordonnée invalide")
 
 
-def lancer_tour(grille):
+def lancer_tour(grille,joueur):
     afficher_grille(grille)
+    flag = 0
+    while flag == 0:
+        if joueur == 1:
+            print("Tour blanc")
+        else:
+            print("Tour noir")
+        print("")
+        choix = menu_choix("Attaque")
+        print("Choisir le pions a bouger")
+        pion = demander_coord()
+        print("")
+        print("Choisir le pions a prendre")
+        prise = demander_coord()
+
+
+
+        if (obtenir_pion(pion,grille) == donner_pion(joueur) and obtenir_pion(prise,grille) == donner_pion(int(not(joueur)))):
+            print(obtenir_pion(pion,grille),"joueur")
+            if choix == 1:
+                faire_mouvement(pion,prise, grille,"elimination")
+                return 0
+            if choix == 2:
+                faire_mouvement(pion,prise, grille,"retournement")
+                return 0
+        else:
+            print("==> Pions adverse selectionner, veillez reassayer")
+            print("")
 
     return 0
 
@@ -265,9 +286,15 @@ def menu_choix(type):
         print(" -> 1 : Configuration de depart")
         print(" -> 2 : Configuration du milieu")
         print(" -> 3 : Configuration de fin")
-        print(" -> 5 : Quitter")
-        possibilité = "(1-5)"
+        print(" -> 4 : Quitter")
+        possibilité = "(1-4)"
         test_pos = ["1","2","3","4",]
+
+    if type == "Attaque":
+        print(" -> 1 : Elimination")
+        print(" -> 2 : Retournement")
+        possibilité = "(1-2)"
+        test_pos = ["1","2"]
 
     print("")
     choix = input("Entrer un numero "+ possibilité +" : ")
@@ -406,7 +433,8 @@ def lancement():
                         initialise(plateau_jeu,"fin")
                         afficher_grille(plateau_jeu)
                     elif choix == 4:
-                        demander_coord(plateau_jeu,"X")
+                        x, y = demander_coord()
+                        mettre_char_coord(plateau_jeu, (x,y),"X")
                         afficher_grille(plateau_jeu)
                 elif choix == 5:
                     quit()
@@ -419,13 +447,15 @@ def lancement():
                     plateau_jeu = donner_grille()
                     if choix == 1:
                         initialise(plateau_jeu,"debut")
+                        lancer_tour(plateau_jeu,1)
                         afficher_grille(plateau_jeu)
-
                     elif choix == 2:
                         initialise(plateau_jeu,"milieu")
+                        lancer_tour(plateau_jeu,1)
                         afficher_grille(plateau_jeu)
                     elif choix == 3:
                         initialise(plateau_jeu,"fin")
+                        lancer_tour(plateau_jeu,1)
                         afficher_grille(plateau_jeu)
                 elif choix == 4:
                     quit()
