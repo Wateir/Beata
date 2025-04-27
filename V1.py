@@ -48,32 +48,36 @@ def faire_mouvement(coord_avant, coord_apres, grille):
         séparent."""
         direction = [0, 0]
         vecteur = (coord_avant[0] - coord_apres[0], coord_avant[1] - coord_apres[1])
-        if (not vecteur[0] and not vecteur[1]):
-           return 1
-        if (not vecteur[0]):
-           direction[0] = 0
-           direction[1] = vecteur[1] // abs(vecteur[1])
-        elif (not vecteur[1]):
-            direction[0] = vecteur[0] // abs(vecteur[0])
-            direction[1] = 0
-        elif (abs(direction[0]) != abs(direction[1]) or abs(direction[0]) < 2 or abs(direction[1]) < 2):
+        if (not vecteur[0] and not vecteur[1]): # Meme coordonnées
             return 1
-        else:
+        if (vecteur[0] != 0 and vecteur[1] != 0): # Deplacement non orthogonaux
+            if (vecteur[0] != vecteur[1]): # Deplacement non diagonale
+                return 1
+        if(vecteur[0] == vecteur[1] and abs(vecteur[1])>=2): # Deplacement diagonal
             direction[0] = vecteur[0] // abs(vecteur[0])
             direction[1] = vecteur[1] // abs(vecteur[1])
+        elif (abs(vecteur[1])>=2): # Deplacement vertical
+           direction[0] = 0
+           direction[1] = vecteur[1] // abs(vecteur[1])
+        elif (abs(vecteur[0])>=2): # Deplacement horizontal
+            direction[0] = vecteur[0] // abs(vecteur[0])
+            direction[1] = 0
+        else:
+            return 1
 
-        pos = [coord_avant[0] + direction[0], coord_avant[1] + direction[1]]
-        while pos[0] != coord_apres[0] and pos[1] != coord_apres[1]:
-            if (grille[pos[0]][pos[1]] != " "):
-                print(coord_avant)
-                print(pos)
+
+        pos = [coord_avant[0] - direction[0], coord_avant[1] - direction[1]]
+        while pos[0] != coord_apres[0]+direction[0] or pos[1] != coord_apres[1]+direction[1]:
+            if (obtenir_pion(pos,grille) != " "):
                 return 1
-            pos[0] += direction[0]
-            pos[1] += direction[1]
+            pos[0] -= direction[0]
+            pos[1] -= direction[1]
 
         mettre_char_coord(grille,coord_apres,obtenir_pion(coord_avant,grille))
         mettre_char_coord(grille,coord_avant," ")
         return 0
+
+
     result = elimination(coord_avant, coord_apres, grille)
 
     return result
@@ -205,17 +209,47 @@ def test_est_dans_grille():
 
 
 def test_faire_mouvement():
-    plateau_test = donner_grille()
 
+    plateau_test = donner_grille()
     mettre_char_coord(plateau_test,(1,1),"●")
+    mettre_char_coord(plateau_test,(1,3),"○")
     assert faire_mouvement((1,1),(1,3), plateau_test) == 0, "Bouger 2 case a droite"
+
+    plateau_test = donner_grille()
+    mettre_char_coord(plateau_test,(1,1),"●")
+    mettre_char_coord(plateau_test,(1,4),"○")
     assert faire_mouvement((1,1),(1,4), plateau_test) == 0, "Bouger 3 case a droite"
+
+    plateau_test = donner_grille()
+    mettre_char_coord(plateau_test,(1,1),"●")
+    mettre_char_coord(plateau_test,(4,1),"○")
+    assert faire_mouvement((1,1),(4,1), plateau_test) == 0, "Bouger 3 case en bas"
+
+    plateau_test = donner_grille()
+    mettre_char_coord(plateau_test,(1,1),"●")
+    mettre_char_coord(plateau_test,(4,4),"○")
+    assert faire_mouvement((1,1),(4,4), plateau_test) == 0, "Bouger 3 case en diagonale"
+
+    plateau_test = donner_grille()
+    mettre_char_coord(plateau_test,(1,1),"●")
+    mettre_char_coord(plateau_test,(4,4),"○")
+    assert faire_mouvement((4,4),(1,1), plateau_test) == 0, "Bouger 3 case en diagonale"
+
+    plateau_test = donner_grille()
+    mettre_char_coord(plateau_test,(1,1),"●")
+    mettre_char_coord(plateau_test,(2,4),"○")
     assert faire_mouvement((1,1),(2,4), plateau_test) == 1, "Deplacement invalide"
+
+    plateau_test = donner_grille()
+    mettre_char_coord(plateau_test,(1,1),"●")
+    mettre_char_coord(plateau_test,(4,1),"○")
+    assert faire_mouvement((1,1),(2,1), plateau_test) == 1, "Bouger 1 case en bas"
 
 
 def test():
     test_est_au_bon_format()
     test_est_dans_grille()
+    test_faire_mouvement()
 
 def lancement():
     plateau_jeu = donner_grille()
