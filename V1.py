@@ -204,6 +204,24 @@ def est_dans_grille(coord):
     else:
         return False
 
+def demander_coord(grille,char):
+    while True:
+        coord = input("Rentrer une coordonnée (exp : A3) : ")
+        if est_au_bon_format(coord):
+            if not est_dans_grille(coord):
+                print("Coordonnée invalide")
+            else:
+                x, y = convertir_en_tuple(coord)
+                mettre_char_coord(grille, (y,x), char)
+                break
+        else:
+            print("Coordonnée invalide")
+
+
+def lancer_tour(grille):
+    afficher_grille(grille)
+
+    return 0
 
 def menu_choix(type):
     print("Select a mode :")
@@ -212,11 +230,12 @@ def menu_choix(type):
 
 
     if type == "ouverture":
-        print(" -> 1 : Atelier 1")
-        print(" -> 2 : Jouer au jeu (Pas implementer)")
-        print(" -> 3 : Relancer les tests")
+        print(" -> 1 : Atelier 2")
+        print(" -> 2 : Atelier 3")
+        print(" -> 3 : Jouer au jeu (Pas implementer)")
+        print(" -> 4 : Relancer les tests")
         possibilité = "(1-3)"
-        test_pos = ["1","2","3"]
+        test_pos = ["1","2","3","3"]
 
     if type == "Atelier1":
         print(" -> 1 : Configuration de depart")
@@ -234,6 +253,21 @@ def menu_choix(type):
         print(" -> 5 : Quitter")
         possibilité = "(1-5)"
         test_pos = ["1","2","3","4","5"]
+
+    if type == "Atelier3":
+        print(" -> 1 : Configuration de depart")
+        print(" -> 2 : Configuration du milieu")
+        print(" -> 3 : Configuration de fin")
+        possibilité = "(1-3)"
+        test_pos = ["1","2","3"]
+
+    if type == "Atelier32":
+        print(" -> 1 : Configuration de depart")
+        print(" -> 2 : Configuration du milieu")
+        print(" -> 3 : Configuration de fin")
+        print(" -> 5 : Quitter")
+        possibilité = "(1-5)"
+        test_pos = ["1","2","3","4",]
 
     print("")
     choix = input("Entrer un numero "+ possibilité +" : ")
@@ -329,7 +363,7 @@ def test_faire_retournement():
     plateau_test = donner_grille()
     mettre_char_coord(plateau_test,(1,1),blanc)
     mettre_char_coord(plateau_test,(3,3),noir)
-    assert faire_mouvement((1,1),(4,4), plateau_test,"elimination") == 0, "Bouger 3 case en diagonale avec pion au milieu"
+    assert faire_mouvement((1,1),(4,4), plateau_test,"retournement") == 0, "Bouger 3 case en diagonale avec pion au milieu"
 
 def test():
     test_est_au_bon_format()
@@ -351,10 +385,52 @@ def lancement():
     test()
 
     choix = 0
-    while not choix in [1]:
+    while not choix in [1,2]:
         choix = menu_choix("ouverture")
+
         if choix == 0:
             error("Choix hors de porté",0)
+        if choix == 1:
+            choix = menu_choix("Atelier1")
+            while True:
+                if choix in [1,2,3,4]:
+                    plateau_jeu = donner_grille()
+                    if choix == 1:
+                        initialise(plateau_jeu,"debut")
+                        afficher_grille(plateau_jeu)
+
+                    elif choix == 2:
+                        initialise(plateau_jeu,"milieu")
+                        afficher_grille(plateau_jeu)
+                    elif choix == 3:
+                        initialise(plateau_jeu,"fin")
+                        afficher_grille(plateau_jeu)
+                    elif choix == 4:
+                        demander_coord(plateau_jeu,"X")
+                        afficher_grille(plateau_jeu)
+                elif choix == 5:
+                    quit()
+                choix = menu_choix("Atelier12")
+
+        if choix == 2:
+            choix = menu_choix("Atelier3")
+            while True:
+                if choix in [1,2,3]:
+                    plateau_jeu = donner_grille()
+                    if choix == 1:
+                        initialise(plateau_jeu,"debut")
+                        afficher_grille(plateau_jeu)
+
+                    elif choix == 2:
+                        initialise(plateau_jeu,"milieu")
+                        afficher_grille(plateau_jeu)
+                    elif choix == 3:
+                        initialise(plateau_jeu,"fin")
+                        afficher_grille(plateau_jeu)
+                elif choix == 4:
+                    quit()
+                choix = menu_choix("Atelier32")
+
         if choix == 3:
             print("Run test")
             test()
@@ -362,36 +438,6 @@ def lancement():
             print("Test passé avec succés")
     choix = 0
 
-    choix = menu_choix("Atelier1")
-    while True:
-        if choix in [1,2,3,4]:
-            plateau_jeu = donner_grille()
-            if choix == 1:
-                initialise(plateau_jeu,"debut")
-                afficher_grille(plateau_jeu)
 
-            elif choix == 2:
-                initialise(plateau_jeu,"milieu")
-                afficher_grille(plateau_jeu)
-            elif choix == 3:
-                initialise(plateau_jeu,"fin")
-                afficher_grille(plateau_jeu)
-            elif choix == 4:
-                coord = input("Rentrer une coordonnée (exp : A3) : ")
-                if est_au_bon_format(coord):
-                    if not est_dans_grille(coord):
-                        print("Coordonnée invalide")
-                    else:
-                        x, y = convertir_en_tuple(coord)
-                        mettre_char_coord(plateau_jeu, (x,y), "X")
-                        print("Yo")
-                        afficher_grille(plateau_jeu)
-                else:
-                    print("Coordonnée invalide")
-        elif choix == 5:
-            break
-        choix = menu_choix("Atelier12")
 
-#lancement()
-
-test_faire_elimination()
+lancement()
