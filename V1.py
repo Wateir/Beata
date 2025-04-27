@@ -67,7 +67,7 @@ def faire_mouvement(coord_avant, coord_apres, grille):
 
 
         pos = [coord_avant[0] - direction[0], coord_avant[1] - direction[1]]
-        while pos[0] != coord_apres[0]+direction[0] or pos[1] != coord_apres[1]+direction[1]:
+        while pos[0] != coord_apres[0] or pos[1] != coord_apres[1]:
             if (obtenir_pion(pos,grille) != " "):
                 return 1
             pos[0] -= direction[0]
@@ -244,6 +244,12 @@ def test_faire_mouvement():
     mettre_char_coord(plateau_test,(1,1),"●")
     mettre_char_coord(plateau_test,(4,1),"○")
     assert faire_mouvement((1,1),(2,1), plateau_test) == 1, "Bouger 1 case en bas"
+
+    plateau_test = donner_grille()
+    mettre_char_coord(plateau_test,(1,1),"●")
+    mettre_char_coord(plateau_test,(4,4),"○")
+    mettre_char_coord(plateau_test,(3,3),"○")
+    assert faire_mouvement((1,1),(4,4), plateau_test) == 1, "Bouger 3 case en diagonale avec pion au milieu"
 
 
 def test():
