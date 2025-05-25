@@ -38,8 +38,6 @@ def obtenir_pion(coord,grille):
     x, y = coord
     return grille[x][y]
 
-
-
 # Retirer permet a l'user de la fonction si l'ancienne postions doit etre retirer
 def bouger_pion(coord_avant,coord_apres,grille,retirer):
     contenu = obtenir_pion(coord_avant,grille)
@@ -47,6 +45,26 @@ def bouger_pion(coord_avant,coord_apres,grille,retirer):
     if retirer == "oui":
         mettre_char_coord(grille, coord_avant, " ")
     return 0
+
+def est_partie_fini(grille):
+    nb_blanc = 0
+    nb_noir = 0
+
+    blanc = donner_pion(1)
+    noir = donner_pion(2)
+
+    for i in range(len(grille)):
+        for j in range(len(grille[i])):
+            actuel = grille[i][j]
+            if actuel == blanc:
+                nb_blanc += 1
+            elif actuel == noir:
+                nb_noir += 1
+
+            if nb_blanc > 6 and nb_noir > 6:
+                return False
+
+    return True
 
 def faire_mouvement(coord_avant, coord_apres, grille,type):
     def verifier_coordonnee(direction,vecteur,distance):
@@ -166,25 +184,12 @@ def initialise(grille, periode):
     else:
         initialise_fin(grille)
 
-
-def afficher_grille(matrice):
-    print("    A   B   C   D   E   F   G   H   I  ")
-    print("  -------------------------------------")
-    coordonnée_vertical = 0
-    for ligne in matrice:
-        ligne_final = "|"
-        coordonnée_vertical += 1
-        for valeur in ligne:
-            ligne_final += f" {valeur} |"
-        print(coordonnée_vertical, ligne_final)
-        print("  -------------------------------------")
-
-
 def est_au_bon_format(coord):
     if len(coord) == 2 and coord[0].isalpha() and coord[1].isdigit():
         lettre = coord[0].upper()
         chiffre = int(coord[1])
         if lettre in 'ABCDEFGHI' and 1 <= chiffre <= 9:
+
             return True
     return False
 
@@ -198,6 +203,18 @@ def est_dans_grille(coord):
             return False
     else:
         return False
+
+def afficher_grille(matrice):
+    print("    A   B   C   D   E   F   G   H   I  ")
+    print("  -------------------------------------")
+    coordonnée_vertical = 0
+    for ligne in matrice:
+        ligne_final = "|"
+        coordonnée_vertical += 1
+        for valeur in ligne:
+            ligne_final += f" {valeur} |"
+        print(coordonnée_vertical, ligne_final)
+        print("  -------------------------------------")
 
 def demander_coord():
     while True:
@@ -224,11 +241,8 @@ def lancer_tour(grille,joueur):
         choix = menu_choix("Attaque")
         print("Choisir le pions a bouger")
         pion = demander_coord()
-        print("")
         print("Choisir le pions a prendre")
         prise = demander_coord()
-
-
 
         if (obtenir_pion(pion,grille) == donner_pion(joueur) and obtenir_pion(prise,grille) == donner_pion(int(not(joueur)))):
             print(obtenir_pion(pion,grille),"joueur")
@@ -253,7 +267,7 @@ def menu_choix(type):
     if type == "ouverture":
         print(" -> 1 : Atelier 2")
         print(" -> 2 : Atelier 3")
-        print(" -> 3 : Jouer au jeu (Pas implementer)")
+        print(" -> 3 : Jouer au jeu")
         print(" -> 4 : Relancer les tests")
         possibilité = "(1-3)"
         test_pos = ["1","2","3","3"]
@@ -303,14 +317,11 @@ def menu_choix(type):
     else:
         return 0
 
-
 def test_est_au_bon_format():
     assert est_au_bon_format("A1") == 1  , "First Case"
     assert est_au_bon_format("I9") == 1  ,"Last Case"
     assert est_au_bon_format("Bad") == 0 , "Bad"
     assert est_au_bon_format("AZ") == 0  , "double lettre"
-
-
 
 def test_est_dans_grille():
     assert est_dans_grille("A1") == 1  , "First Case"
@@ -320,7 +331,6 @@ def test_est_dans_grille():
     assert est_dans_grille("A10") == 0 , "Pas dans la grille"
     assert est_dans_grille("A0") == 0  , "Pas dans la grille"
     assert est_dans_grille("J9") == 0  , "First case not on the grille"
-
 
 def test_faire_elimination():
     blanc = donner_pion(1)
@@ -412,7 +422,7 @@ def lancement():
     test()
 
     choix = 0
-    while not choix in [1,2]:
+    while not choix in [1,2,3]:
         choix = menu_choix("ouverture")
 
         if choix == 0:
@@ -462,12 +472,29 @@ def lancement():
                 choix = menu_choix("Atelier32")
 
         if choix == 3:
+            grille = donner_grille()
+            initialise(grille,"debut")
+            jeu(grille)
+
+        if choix == 4:
             print("Run test")
             test()
             print("")
             print("Test passé avec succés")
     choix = 0
 
+def jeu(grille):
+    win = 0
+    joueur = 1
+    while win == 0:
+        if not est_partie_fini(grille):
+            lancer_tour(grille, joueur)
+            joueur = int(not(joueur))
+        else:
+            win = 1
 
+
+
+    return 0
 
 lancement()
